@@ -1,0 +1,49 @@
+{
+  "name": "readme-autoscan",
+  "version": "1.0.0",
+  "description": "CLI tool to scan JavaScript/TypeScript projects and auto-generate clean README.md files.",
+  "main": "dist/cli.js",
+  "types": "dist/cli.d.ts",
+  "bin": {
+    "readme-autoscan": "bin/readme-autoscan.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "node ./bin/readme-autoscan.js --dry-run",
+    "check": "tsc --noEmit",
+    "test": "echo \"No tests yet\""
+  },
+  "files": [
+    "dist",
+    "bin",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "readme",
+    "cli",
+    "documentation",
+    "typescript",
+    "automation"
+  ],
+  "author": "JomsCode21",
+  "license": "MIT",
+  "type": "commonjs",
+  "dependencies": {
+    "commander": "^12.1.0",
+    "fast-glob": "^3.3.3",
+    "picocolors": "^1.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.17",
+    "typescript": "^5.8.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JomsCode21/README-auto-scan.git"
+  },
+  "bugs": {
+    "url": "https://github.com/JomsCode21/README-auto-scan/issues"
+  },
+  "homepage": "https://github.com/JomsCode21/README-auto-scan#readme"
+}
