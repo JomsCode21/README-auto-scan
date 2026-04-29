@@ -1,10 +1,11 @@
 # README Auto Scan
 
 [![npm version](https://img.shields.io/npm/v/readme-autoscan.svg)](https://www.npmjs.com/package/readme-autoscan)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![npm downloads](https://img.shields.io/npm/dm/readme-autoscan.svg)](https://www.npmjs.com/package/readme-autoscan)
+[![license](https://img.shields.io/npm/l/readme-autoscan.svg)](LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/JomsCode21/README-auto-scan.svg)](https://github.com/JomsCode21/README-auto-scan/stargazers)
 
-> CLI tool that scans JavaScript/TypeScript projects and automatically generates clean, professional README.md files with installation, usage, scripts, environment variables, and publishing checklist.
+> CLI tool that scans JavaScript and TypeScript projects and automatically generates clean README.md files with installation, usage, scripts, environment variables, and publishing checklist.
 
 ## ✨ Features
 
@@ -43,32 +44,23 @@ npm run build
 
 ## 🚀 Usage
 
-### Basic Usage
-
-Generate README.md in the current directory:
+Generate a README.md in the current directory:
 
 ```bash
 readme-autoscan
 ```
 
-### Preview Without Writing
-
-Preview the generated README without creating a file:
+Preview the output without writing a file:
 
 ```bash
 readme-autoscan --dry-run
 ```
 
-### Custom Output Path
-
-Write to a different location:
+Write to a custom location:
 
 ```bash
 readme-autoscan --output docs/README.md
-readme-autoscan --output packages/core/README.md
 ```
-
-### Force Overwrite
 
 Overwrite an existing README.md:
 
@@ -76,19 +68,26 @@ Overwrite an existing README.md:
 readme-autoscan --force
 ```
 
-### Include Project Structure
-
-Add a file tree to the README:
+Include the project file tree:
 
 ```bash
 readme-autoscan --include-tree
 ```
 
-### Skip Checklist
-
-Generate README without the publishing checklist:
+Skip the publishing checklist:
 
 ```bash
+readme-autoscan --no-checklist
+```
+
+### Examples
+
+```bash
+readme-autoscan
+readme-autoscan --dry-run
+readme-autoscan --output docs/README.md
+readme-autoscan --force
+readme-autoscan --include-tree
 readme-autoscan --no-checklist
 ```
 
@@ -137,11 +136,11 @@ myawesomepackage.someFunction();
 
 ## Available Scripts
 
-| Script | Description              | Command           |
-| ------ | ------------------------ | ----------------- |
-| dev    | Start development server | vite              |
-| build  | Build for production     | tsc && vite build |
-| test   | Run test suite           | vitest            |
+| Script | Description              | Command             |
+| ------ | ------------------------ | ------------------- |
+| dev    | Start development server | `vite`              |
+| build  | Build for production     | `tsc && vite build` |
+| test   | Run test suite           | `vitest`            |
 
 ## License
 
@@ -152,15 +151,15 @@ This project is licensed under the MIT License.
 
 README Auto Scan automatically detects these project types:
 
-| Type            | Detection Criteria                             |
-| --------------- | ---------------------------------------------- |
-| **CLI Package** | Has `bin` field in package.json                |
-| **TypeScript**  | Has `typescript` dependency or `tsconfig.json` |
-| **React App**   | Has `react` dependency                         |
-| **Vue App**     | Has `vue` dependency                           |
-| **Next.js**     | Has `next` dependency or `next.config.js`      |
-| **Vite**        | Has `vite` dependency or `vite.config.*`       |
-| **Express**     | Has `express` dependency                       |
+| Type        | Detection Criteria                             |
+| ----------- | ---------------------------------------------- |
+| CLI Package | Has `bin` field in package.json                |
+| TypeScript  | Has `typescript` dependency or `tsconfig.json` |
+| React App   | Has `react` dependency                         |
+| Vue App     | Has `vue` dependency                           |
+| Next.js     | Has `next` dependency or `next.config.js`      |
+| Vite        | Has `vite` dependency or `vite.config.*`       |
+| Express     | Has `express` dependency                       |
 
 ## 🧪 Development
 
