@@ -1,6 +1,6 @@
 {
   "name": "readme-autoscan",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "CLI tool that scans JavaScript/TypeScript projects and automatically generates clean, professional README.md files with installation, usage, scripts, environment variables, and publishing checklist.",
   "main": "dist/cli.js",
   "types": "dist/cli.d.ts",
