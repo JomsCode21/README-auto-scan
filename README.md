@@ -234,7 +234,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
 
-Copyright (c) 2024 JomsCode21
+Copyright (c) 2026 JomsCode21
 
 ## 🔗 Links
 
