@@ -1,7 +1,7 @@
 {
   "name": "readme-autoscan",
   "version": "1.0.0",
-  "description": "CLI tool to scan JavaScript/TypeScript projects and auto-generate clean README.md files.",
+  "description": "CLI tool that scans JavaScript/TypeScript projects and automatically generates clean, professional README.md files with installation, usage, scripts, environment variables, and publishing checklist.",
   "main": "dist/cli.js",
   "types": "dist/cli.d.ts",
   "bin": {
@@ -11,7 +11,8 @@
     "build": "tsc -p tsconfig.json",
     "dev": "node ./bin/readme-autoscan.js --dry-run",
     "check": "tsc --noEmit",
-    "test": "echo \"No tests yet\""
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "files": [
     "dist",
@@ -21,10 +22,16 @@
   ],
   "keywords": [
     "readme",
-    "cli",
+    "readme-generator",
     "documentation",
+    "cli",
+    "markdown",
+    "npm-package",
+    "project-scanner",
     "typescript",
-    "automation"
+    "javascript",
+    "auto-generate",
+    "documentation-tool"
   ],
   "author": "JomsCode21",
   "license": "MIT",
@@ -36,7 +43,8 @@
   },
   "devDependencies": {
     "@types/node": "^22.15.17",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "vitest": "^2.1.0"
   },
   "repository": {
     "type": "git",
