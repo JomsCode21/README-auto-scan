@@ -79,6 +79,7 @@ async function run(options: CliOptions): Promise<void> {
   });
 
   if (options.dryRun) {
+    console.log(pc.cyan(`Detected package manager: ${scan.packageManager}`));
     console.log(markdown);
     console.log(
       pc.cyan(
@@ -104,6 +105,7 @@ async function run(options: CliOptions): Promise<void> {
   }
 
   const relativePath = path.relative(rootDir, targetPath);
+  console.log(pc.cyan(`Detected package manager: ${scan.packageManager}`));
   console.log(
     pc.green(`✓ README.md generated successfully at ${relativePath}`),
   );

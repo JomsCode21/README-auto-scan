@@ -7,19 +7,19 @@
 
 > CLI tool that scans JavaScript and TypeScript projects and automatically generates clean README.md files with installation, usage, scripts, environment variables, and publishing checklist.
 
-## ✨ Features
+## Features
 
-- 🔍 **Smart Project Detection** — Automatically detects project types (Node.js, React, Vue, Next.js, Vite, Express, TypeScript, CLI packages)
-- 📦 **Package.json Analysis** — Extracts metadata, scripts, dependencies, exports, and repository info
-- 📝 **Auto-Generated Documentation** — Creates professional README sections with proper formatting
-- 🌍 **Environment Variables** — Parses `.env.example` and includes variable tables
-- 🎯 **NPM Scripts Table** — Generates markdown tables with human-readable script descriptions
-- 🛡️ **Safe by Default** — Won't overwrite existing files without `--force` flag
-- 🔧 **CLI & Library Support** — Handles both CLI packages and regular npm libraries
-- 📁 **Project Structure** — Optional file tree with `--include-tree`
-- ✅ **Publishing Checklist** — Built-in checklist for npm package releases
+- **Smart Project Detection** — Automatically detects project types (Node.js, React, Vue, Next.js, Vite, Express, TypeScript, CLI packages)
+- **Package.json Analysis** — Extracts metadata, scripts, dependencies, exports, and repository info
+- **Auto-Generated Documentation** — Creates professional README sections with proper formatting
+- **Environment Variables** — Parses `.env.example` and includes variable tables
+- **NPM Scripts Table** — Generates markdown tables with human-readable script descriptions
+- **Safe by Default** — Won't overwrite existing files without `--force` flag
+- **CLI & Library Support** — Handles both CLI packages and regular npm libraries
+- **Project Structure** — Optional file tree with `--include-tree`
+- **Publishing Checklist** — Built-in checklist for npm package releases
 
-## 📦 Installation
+## Installation
 
 ### Global Installation
 
@@ -42,7 +42,7 @@ npm install
 npm run build
 ```
 
-## 🚀 Usage
+## Usage
 
 Generate a README.md in the current directory:
 
@@ -91,7 +91,7 @@ readme-autoscan --include-tree
 readme-autoscan --no-checklist
 ```
 
-## 📋 CLI Options
+## CLI Options
 
 | Option            | Description                                        |
 | ----------------- | -------------------------------------------------- |
@@ -103,7 +103,7 @@ readme-autoscan --no-checklist
 | `-v, --version`   | Show package version                               |
 | `-h, --help`      | Show help message                                  |
 
-## 🎯 Example Output
+## Example Output
 
 Here's what a generated README looks like:
 
@@ -147,7 +147,7 @@ myawesomepackage.someFunction();
 This project is licensed under the MIT License.
 ```
 
-## 🔍 Project Type Detection
+## Project Type Detection
 
 README Auto Scan automatically detects these project types:
 
@@ -161,7 +161,28 @@ README Auto Scan automatically detects these project types:
 | Vite        | Has `vite` dependency or `vite.config.*`       |
 | Express     | Has `express` dependency                       |
 
-## 🧪 Development
+## Package Manager Detection
+
+README Auto Scan automatically detects your package manager from lock files and generates matching commands in Installation, Available Scripts, and Development sections.
+
+| Lock File                      | Package Manager |
+| ------------------------------ | --------------- |
+| `package-lock.json`            | npm             |
+| `pnpm-lock.yaml`               | pnpm            |
+| `yarn.lock`                    | yarn            |
+| `bun.lockb` or `bun.lock`      | bun             |
+
+If no supported lock file is found, it falls back to npm.
+
+Example: if your project contains `pnpm-lock.yaml`, generated commands use:
+
+```bash
+pnpm install
+pnpm dev
+pnpm build
+```
+
+## Development
 
 ```bash
 # Install dependencies
@@ -180,19 +201,25 @@ npm test
 npm run dev
 ```
 
-## 📁 Project Structure
+## Project Structure
 
 ```text
 readme-autoscan/
 ├─ src/
-│  ├─ cli.ts           # CLI entry point and argument parsing
-│  ├─ scanner.ts       # Project scanning and analysis
-│  ├─ detector.ts      # Project type detection
-│  ├─ generator.ts     # README markdown generation
-│  ├─ env.ts           # .env.example parsing
-│  ├─ scripts.ts       # NPM script descriptions
-│  ├─ utils.ts         # Utility functions
-│  └─ *.test.ts        # Test files
+│  ├─ cli.ts              # CLI entry point and argument parsing
+│  ├─ scanner.ts          # Project scanning and analysis
+│  ├─ detector.ts         # Project type detection
+│  ├─ generator.ts        # README markdown generation
+│  ├─ env.ts              # .env.example parsing
+│  ├─ scripts.ts          # NPM script descriptions
+│  ├─ package-manager.ts  # Package manager detection
+│  └─ utils.ts            # Utility functions
+├─ tests/
+│  ├─ generator.test.ts
+│  ├─ package-manager.test.ts
+│  ├─ scripts.test.ts
+│  ├─ utils.test.ts
+│  └─ env.test.ts
 ├─ bin/
 │  └─ readme-autoscan.js  # Executable entry point
 ├─ package.json
@@ -201,7 +228,7 @@ readme-autoscan/
 └─ LICENSE
 ```
 
-## 🏗️ Generated README Sections
+## Generated README Sections
 
 The tool generates these sections based on your project:
 
@@ -219,7 +246,7 @@ The tool generates these sections based on your project:
 12. **License** — From package.json
 13. **Contributing** — Standard contribution message
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
@@ -229,13 +256,13 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
 
 Copyright (c) 2026 JomsCode21
 
-## 🔗 Links
+## Links
 
 - **Repository:** [github.com/JomsCode21/README-auto-scan](https://github.com/JomsCode21/README-auto-scan)
 - **Issues:** [github.com/JomsCode21/README-auto-scan/issues](https://github.com/JomsCode21/README-auto-scan/issues)
@@ -243,4 +270,4 @@ Copyright (c) 2026 JomsCode21
 
 ---
 
-Made with ❤️ for the JavaScript/TypeScript community
+Made for the JavaScript/TypeScript community

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { explainScripts } from "./scripts";
+import { explainScripts } from "../src/scripts";
 
 describe("explainScripts", () => {
   it("should describe common scripts correctly", () => {
@@ -22,12 +22,12 @@ describe("explainScripts", () => {
     expect(result[1]).toEqual({
       name: "build",
       command: "tsc && vite build",
-      description: "Build for production",
+      description: "Build the project",
     });
     expect(result[2]).toEqual({
       name: "test",
       command: "vitest",
-      description: "Run test suite",
+      description: "Run tests",
     });
   });
 
@@ -49,10 +49,38 @@ describe("explainScripts", () => {
       "Run tests with coverage"
     );
     expect(result.find((r) => r.name === "lint:fix")?.description).toBe(
-      "Fix linting issues automatically"
+      "Fix lint issues"
     );
     expect(result.find((r) => r.name === "typecheck")?.description).toBe(
-      "Check TypeScript types"
+      "Run TypeScript checks"
+    );
+  });
+
+  it("should use newly mapped project script descriptions", () => {
+    const scripts = {
+      check: "tsc --noEmit && npm test",
+      ci: "npm run check && npm run build",
+      prepublishOnly: "npm run check && npm run build",
+      "build:storybook": "storybook build",
+      coverage: "vitest run --coverage",
+    };
+
+    const result = explainScripts(scripts);
+
+    expect(result.find((r) => r.name === "check")?.description).toBe(
+      "Run project checks"
+    );
+    expect(result.find((r) => r.name === "ci")?.description).toBe(
+      "Run CI checks"
+    );
+    expect(result.find((r) => r.name === "prepublishOnly")?.description).toBe(
+      "Run checks before npm publish"
+    );
+    expect(result.find((r) => r.name === "build:storybook")?.description).toBe(
+      "Build Storybook"
+    );
+    expect(result.find((r) => r.name === "coverage")?.description).toBe(
+      "Run tests with coverage"
     );
   });
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseEnvExample } from "./env";
+import { parseEnvExample } from "../src/env";
 
 describe("parseEnvExample", () => {
   it("should parse variables from .env.example content", async () => {

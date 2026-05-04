@@ -1,4 +1,5 @@
 import type { ScanResult } from "./scanner";
+import { getPackageManager } from "./package-manager";
 
 export interface GenerateOptions {
   includeChecklist: boolean;
@@ -69,35 +70,27 @@ function getFeatureBullets(scan: ScanResult): string[] {
 }
 
 function getInstallationSection(scan: ScanResult): string {
+  const pm = getPackageManager(scan.packageManager);
   const lines = ["## Installation"];
+
+  lines.push("");
+  lines.push("Install dependencies:");
+  lines.push(["```bash", pm.install, "```"].join("\n"));
 
   if (scan.hasBin) {
     lines.push("");
-    lines.push("Install globally (optional):");
-    lines.push(
-      ["```bash", `npm install -g ${scan.packageName}`, "```"].join("\n"),
-    );
-    lines.push("");
-    lines.push("Or use with npx (no installation):");
-    lines.push(["```bash", `npx ${scan.packageName}`, "```"].join("\n"));
-  } else {
-    lines.push("");
-    lines.push(
-      ["```bash", `npm install ${scan.packageName}`, "```"].join("\n"),
-    );
-    lines.push("");
-    lines.push("Or with yarn:");
-    lines.push(["```bash", `yarn add ${scan.packageName}`, "```"].join("\n"));
+    lines.push("Run the CLI (if installed globally or linked):");
+    lines.push(["```bash", scan.binCommands[0] ?? scan.packageName, "```"].join("\n"));
   }
 
   lines.push("");
-  lines.push("For local development:");
+  lines.push("For local setup from repository:");
   lines.push(
     [
       "```bash",
       "git clone <repository-url>",
       "cd " + scan.packageName,
-      "npm install",
+      pm.install,
       "```",
     ].join("\n"),
   );
@@ -106,6 +99,7 @@ function getInstallationSection(scan: ScanResult): string {
 }
 
 function getUsageSection(scan: ScanResult): string {
+  const pm = getPackageManager(scan.packageManager);
   const lines = ["## Usage"];
 
   if (scan.hasBin && scan.binCommands.length > 0) {
@@ -139,14 +133,14 @@ function getUsageSection(scan: ScanResult): string {
     );
   }
 
-  // Add npm script usage if available
+  // Add package manager script usage if available
   const devScript = scan.scripts.find(
     (s) => s.name === "dev" || s.name === "start",
   );
   if (devScript) {
     lines.push("");
     lines.push("For development:");
-    lines.push(["```bash", `npm run ${devScript.name}`, "```"].join("\n"));
+    lines.push(["```bash", pm.run(devScript.name), "```"].join("\n"));
   }
 
   return lines.join("\n");
@@ -192,18 +186,15 @@ export function generateReadme(
 
   // Available Scripts
   if (scan.scripts.length > 0) {
+    const pm = getPackageManager(scan.packageManager);
     sections.push("## Available Scripts");
     sections.push("");
     sections.push("| Script | Description | Command |");
     sections.push("|--------|-------------|---------|");
     scan.scripts.forEach((script) => {
-      const cleanCommand = script.command
-        .replace(/\|/g, "\\|")
-        .substring(0, 40);
-      const displayCmd =
-        script.command.length > 40 ? cleanCommand + "..." : cleanCommand;
+      const runCommand = pm.run(script.name);
       sections.push(
-        `| \`${script.name}\` | ${script.description} | \`${displayCmd}\` |`,
+        `| \`${script.name}\` | ${script.description} | \`${runCommand}\` |`,
       );
     });
   }
@@ -255,24 +246,30 @@ export function generateReadme(
   }
 
   // Development
-  const devScript = scan.scripts.find((s) => s.name === "dev");
-  const hasDevScript = !!devScript;
+  const hasCheckScript = scan.scripts.some((s) => s.name === "check");
+  const hasBuildScript = scan.scripts.some((s) => s.name === "build");
+  const hasDevScript = scan.scripts.some((s) => s.name === "dev");
+  const pm = getPackageManager(scan.packageManager);
 
   sections.push("## Development");
   sections.push("");
   sections.push("```bash");
   sections.push("# Install dependencies");
-  sections.push("npm install");
-  sections.push("");
-  sections.push("# Run type checking");
-  sections.push("npm run check");
-  sections.push("");
-  sections.push("# Build the project");
-  sections.push("npm run build");
+  sections.push(pm.install);
+  if (hasCheckScript) {
+    sections.push("");
+    sections.push("# Run type checking");
+    sections.push(pm.run("check"));
+  }
+  if (hasBuildScript) {
+    sections.push("");
+    sections.push("# Build the project");
+    sections.push(pm.run("build"));
+  }
   if (hasDevScript) {
     sections.push("");
     sections.push("# Start development mode");
-    sections.push("npm run dev");
+    sections.push(pm.run("dev"));
   }
   sections.push("```");
 

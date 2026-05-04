@@ -2,6 +2,7 @@ import fg from "fast-glob";
 import path from "path";
 import { detectProjectTypes } from "./detector";
 import { parseEnvExample } from "./env";
+import { detectPackageManager, type PackageManagerName } from "./package-manager";
 import { explainScripts } from "./scripts";
 import {
   fileExists,
@@ -47,6 +48,7 @@ export interface ScanResult {
   envVariables: string[];
   sourceFiles: string[];
   testFiles: string[];
+  packageManager: PackageManagerName;
 }
 
 const IMPORTANT_FILES = [
@@ -121,6 +123,8 @@ export async function scanProject(rootDir: string): Promise<ScanResult> {
     hasBin,
   });
 
+  const packageManager = await detectPackageManager(rootDir);
+
   return {
     rootDir,
     packageJson,
@@ -148,5 +152,6 @@ export async function scanProject(rootDir: string): Promise<ScanResult> {
     envVariables,
     sourceFiles,
     testFiles,
+    packageManager: packageManager.name,
   };
 }

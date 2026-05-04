@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { normalizeAuthor, toArray, toPosixPath } from "./utils";
+import { normalizeAuthor, toArray, toPosixPath } from "../src/utils";
 
 describe("toArray", () => {
   it("should return empty array for undefined", () => {
