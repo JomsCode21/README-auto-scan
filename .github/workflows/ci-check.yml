@@ -37,11 +37,14 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Run tests
+        run: npm test
+
       - name: PowerShell - Verify build output
         shell: pwsh
         run: |
           Write-Host "=== Verifying build output ===" -ForegroundColor Cyan
-          $requiredFiles = @("dist/cli.js", "dist/cli.d.ts", "dist/scanner.js", "dist/detector.js", "dist/generator.js", "dist/env.js", "dist/scripts.js", "dist/utils.js")
+          $requiredFiles = @("dist/cli.js", "dist/cli.d.ts", "dist/scanner.js", "dist/detector.js", "dist/generator.js", "dist/env.js", "dist/scripts.js", "dist/package-manager.js", "dist/utils.js")
           $errors = 0
           foreach ($file in $requiredFiles) {
             if (Test-Path $file) {

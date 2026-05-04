@@ -1,6 +1,6 @@
 # README Auto Scan
 
-[![npm version](https://img.shields.io/npm/v/readme-autoscan.svg)](https://www.npmjs.com/package/readme-autoscan)
+[![npm version](https://img.shields.io/npm/v/readme-autoscan.svg?style=flat-square)](https://www.npmjs.com/package/readme-autoscan)
 [![npm downloads](https://img.shields.io/npm/dm/readme-autoscan.svg)](https://www.npmjs.com/package/readme-autoscan)
 [![license](https://img.shields.io/npm/l/readme-autoscan.svg)](LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/JomsCode21/README-auto-scan.svg)](https://github.com/JomsCode21/README-auto-scan/stargazers)
