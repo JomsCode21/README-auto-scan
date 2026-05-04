@@ -5,15 +5,18 @@
 [![license](https://img.shields.io/npm/l/readme-autoscan.svg)](LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/JomsCode21/README-auto-scan.svg)](https://github.com/JomsCode21/README-auto-scan/stargazers)
 
-> CLI tool that scans JavaScript and TypeScript projects and automatically generates clean README.md files with installation, usage, scripts, environment variables, and publishing checklist.
+> CLI tool that scans JavaScript, TypeScript, and Python projects and automatically generates clean README.md files with installation, usage, scripts, environment variables, and publishing checklist.
 
 ## Features
 
-- **Smart Project Detection** — Automatically detects project types (Node.js, React, Vue, Next.js, Vite, Express, TypeScript, CLI packages)
+- **Multi-Language Support** — JavaScript, TypeScript, and Python projects
+- **Smart Project Detection** — Automatically detects project types (Node.js, React, Vue, Next.js, Vite, Express, TypeScript, CLI packages, Python, Django, Flask)
+- **Package Manager Detection** — npm, pnpm, yarn, bun for JS/TS; pip, Poetry, Pipenv for Python
 - **Package.json Analysis** — Extracts metadata, scripts, dependencies, exports, and repository info
 - **Auto-Generated Documentation** — Creates professional README sections with proper formatting
 - **Environment Variables** — Parses `.env.example` and includes variable tables
 - **NPM Scripts Table** — Generates markdown tables with human-readable script descriptions
+- **Python Dependencies** — Parses requirements.txt and includes dependency tables
 - **Safe by Default** — Won't overwrite existing files without `--force` flag
 - **CLI & Library Support** — Handles both CLI packages and regular npm libraries
 - **Project Structure** — Optional file tree with `--include-tree`
@@ -93,15 +96,15 @@ readme-autoscan --no-checklist
 
 ## CLI Options
 
-| Option            | Description                                        |
-| ----------------- | -------------------------------------------------- |
+| Option | Description |
+| ------ | ----------- |
 | `--output <file>` | Write README to a custom file (default: README.md) |
-| `--force`         | Overwrite existing README.md                       |
-| `--dry-run`       | Print generated README without writing a file      |
-| `--include-tree`  | Include project structure in the README            |
-| `--no-checklist`  | Skip publishing checklist section                  |
-| `-v, --version`   | Show package version                               |
-| `-h, --help`      | Show help message                                  |
+| `--force` | Overwrite existing README.md |
+| `--dry-run` | Print generated README without writing a file |
+| `--include-tree` | Include project structure in the README |
+| `--no-checklist` | Skip publishing checklist section |
+| `-v, --version` | Show package version |
+| `-h, --help` | Show help message |
 
 ## Example Output
 
@@ -151,35 +154,91 @@ This project is licensed under the MIT License.
 
 README Auto Scan automatically detects these project types:
 
-| Type        | Detection Criteria                             |
-| ----------- | ---------------------------------------------- |
-| CLI Package | Has `bin` field in package.json                |
-| TypeScript  | Has `typescript` dependency or `tsconfig.json` |
-| React App   | Has `react` dependency                         |
-| Vue App     | Has `vue` dependency                           |
-| Next.js     | Has `next` dependency or `next.config.js`      |
-| Vite        | Has `vite` dependency or `vite.config.*`       |
-| Express     | Has `express` dependency                       |
+| Type | Detection Criteria |
+| ---- | ------------------ |
+| CLI Package | Has `bin` field in package.json |
+| TypeScript | Has `typescript` dependency or `tsconfig.json` |
+| React App | Has `react` dependency |
+| Vue App | Has `vue` dependency |
+| Next.js | Has `next` dependency or `next.config.js` |
+| Vite | Has `vite` dependency or `vite.config.*` |
+| Express | Has `express` dependency |
+| Python | Has `requirements.txt`, `pyproject.toml`, `setup.py`, etc. |
+| Django | Has `manage.py` or `django` in dependencies |
+| Flask | Has `app.py` or `flask` in dependencies |
 
-## Package Manager Detection
+## Multi-Language Support
 
-README Auto Scan automatically detects your package manager from lock files and generates matching commands in Installation, Available Scripts, and Development sections.
+README Auto Scan supports JavaScript, TypeScript, and Python projects.
 
-| Lock File                      | Package Manager |
-| ------------------------------ | --------------- |
-| `package-lock.json`            | npm             |
-| `pnpm-lock.yaml`               | pnpm            |
-| `yarn.lock`                    | yarn            |
-| `bun.lockb` or `bun.lock`      | bun             |
+| Language | Detection Files |
+| -------- | --------------- |
+| JavaScript/TypeScript | `package.json`, `tsconfig.json`, `vite.config.*`, `next.config.js` |
+| Python | `requirements.txt`, `pyproject.toml`, `setup.py`, `Pipfile`, `poetry.lock`, `main.py`, `app.py`, `manage.py` |
 
-If no supported lock file is found, it falls back to npm.
+### JavaScript/TypeScript Package Manager Detection
 
-Example: if your project contains `pnpm-lock.yaml`, generated commands use:
+README Auto Scan automatically detects your package manager from lock files and generates matching commands.
+
+| Lock File | Package Manager |
+| --------- | --------------- |
+| `package-lock.json` | npm |
+| `pnpm-lock.yaml` | pnpm |
+| `yarn.lock` | yarn |
+| `bun.lockb` or `bun.lock` | bun |
+
+Example with pnpm:
 
 ```bash
 pnpm install
 pnpm dev
 pnpm build
+```
+
+### Python Support
+
+README Auto Scan detects common Python project files and generates Python-friendly README sections.
+
+| Python Tool | Detection File | Example Commands |
+| ----------- | -------------- | ---------------- |
+| pip | `requirements.txt` | `pip install -r requirements.txt` |
+| Poetry | `pyproject.toml`, `poetry.lock` | `poetry install` |
+| Pipenv | `Pipfile` | `pipenv install` |
+| Django | `manage.py` | `python manage.py runserver` |
+
+Example Python README output:
+
+```markdown
+# my-python-project
+
+A Python project.
+
+## Installation
+
+\`\`\`bash
+pip install -r requirements.txt
+\`\`\`
+
+### Python Example
+
+Run the application:
+
+\`\`\`bash
+python main.py
+\`\`\`
+
+Run tests:
+
+\`\`\`bash
+pytest
+\`\`\`
+
+Dependencies:
+
+| Package | Version |
+| ------- | ------- |
+| requests | latest |
+| flask | ==3.0.0 |
 ```
 
 ## Development
@@ -206,22 +265,25 @@ npm run dev
 ```text
 readme-autoscan/
 ├─ src/
-│  ├─ cli.ts              # CLI entry point and argument parsing
-│  ├─ scanner.ts          # Project scanning and analysis
-│  ├─ detector.ts         # Project type detection
-│  ├─ generator.ts        # README markdown generation
-│  ├─ env.ts              # .env.example parsing
-│  ├─ scripts.ts          # NPM script descriptions
-│  ├─ package-manager.ts  # Package manager detection
-│  └─ utils.ts            # Utility functions
+│  ├─ cli.ts                 # CLI entry point and argument parsing
+│  ├─ scanner.ts             # Project scanning and analysis
+│  ├─ detector.ts            # Project type detection
+│  ├─ generator.ts           # README markdown generation
+│  ├─ env.ts                 # .env.example parsing
+│  ├─ scripts.ts             # NPM script descriptions
+│  ├─ package-manager.ts    # Package manager detection
+│  ├─ utils.ts               # Utility functions
+│  └─ languages/
+│     └─ python.ts           # Python project detection
 ├─ tests/
 │  ├─ generator.test.ts
 │  ├─ package-manager.test.ts
 │  ├─ scripts.test.ts
 │  ├─ utils.test.ts
-│  └─ env.test.ts
+│  ├─ env.test.ts
+│  └─ python.test.ts         # Python detection tests
 ├─ bin/
-│  └─ readme-autoscan.js  # Executable entry point
+│  └─ readme-autoscan.js     # Executable entry point
 ├─ package.json
 ├─ tsconfig.json
 ├─ README.md
@@ -270,4 +332,4 @@ Copyright (c) 2026 JomsCode21
 
 ---
 
-Made for the JavaScript/TypeScript community
+Made for the JavaScript, TypeScript, and Python community

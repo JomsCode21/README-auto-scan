@@ -1,7 +1,7 @@
 {
   "name": "readme-autoscan",
-  "version": "1.1.0",
-  "description": "CLI tool that scans JavaScript/TypeScript projects and automatically generates clean, professional README.md files with installation, usage, scripts, environment variables, and publishing checklist.",
+  "version": "1.2.0",
+  "description": "CLI tool that scans JavaScript, TypeScript, and Python projects and automatically generates clean, professional README.md files with installation, usage, scripts, environment variables, and publishing checklist.",
   "main": "dist/cli.js",
   "types": "dist/cli.d.ts",
   "bin": {
@@ -30,6 +30,10 @@
     "project-scanner",
     "typescript",
     "javascript",
+    "python",
+    "django",
+    "poetry",
+    "pipenv",
     "auto-generate",
     "documentation-tool"
   ],

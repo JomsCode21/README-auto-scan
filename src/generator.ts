@@ -1,4 +1,5 @@
 import type { ScanResult } from "./scanner";
+import { parseDependenciesTable } from "./languages/python";
 import { getPackageManager } from "./package-manager";
 
 export interface GenerateOptions {
@@ -70,7 +71,7 @@ function getFeatureBullets(scan: ScanResult): string[] {
 }
 
 function getInstallationSection(scan: ScanResult): string {
-  const pm = getPackageManager(scan.packageManager);
+  const pm = getPackageManager(scan.packageManager ?? "npm");
   const lines = ["## Installation"];
 
   lines.push("");
@@ -99,7 +100,7 @@ function getInstallationSection(scan: ScanResult): string {
 }
 
 function getUsageSection(scan: ScanResult): string {
-  const pm = getPackageManager(scan.packageManager);
+  const pm = getPackageManager(scan.packageManager ?? "npm");
   const lines = ["## Usage"];
 
   if (scan.hasBin && scan.binCommands.length > 0) {
@@ -146,7 +147,212 @@ function getUsageSection(scan: ScanResult): string {
   return lines.join("\n");
 }
 
-export function generateReadme(
+// Python-specific feature bullets
+function getPythonFeatureBullets(scan: ScanResult): string[] {
+  const features = [
+    "Python project structure detection",
+    "Installation instructions",
+    "Development and testing commands",
+  ];
+
+  if (scan.pythonInfo?.framework === "django") {
+    features.push("Django project detection");
+    features.push("Local development server instructions");
+    features.push("Django testing command");
+  }
+
+  if (scan.pythonInfo?.framework === "flask") {
+    features.push("Flask project detection");
+    features.push("Local app run instructions");
+  }
+
+  if (scan.envVariables.length > 0) {
+    features.push("Environment variable documentation from .env.example");
+  }
+
+  features.push("Clean, professional markdown formatting");
+
+  return features.map((f) => `- ${f}`);
+}
+
+// Python installation section
+function getPythonInstallationSection(scan: ScanResult): string {
+  const lines = ["## Installation"];
+  lines.push("");
+
+  const installCmd = scan.pythonInfo?.installCommand;
+  if (installCmd) {
+    lines.push("Install dependencies:");
+    lines.push(["```bash", installCmd, "```"].join("\n"));
+  } else {
+    lines.push("Add your installation command here.");
+    lines.push("");
+    lines.push("```bash");
+    lines.push("# Example: pip install -r requirements.txt");
+    lines.push("```");
+  }
+
+  return lines.join("\n");
+}
+
+// Python usage section
+function getPythonUsageSection(scan: ScanResult): string {
+  const lines = ["## Usage"];
+  lines.push("");
+
+  const runCmd = scan.pythonInfo?.runCommand;
+  if (runCmd) {
+    lines.push("Run the project:");
+    lines.push(["```bash", runCmd, "```"].join("\n"));
+  } else {
+    lines.push("Add your usage command here.");
+    lines.push("");
+    lines.push("```bash");
+    lines.push("# Example: python main.py");
+    lines.push("```");
+  }
+
+  return lines.join("\n");
+}
+
+// Python testing section
+function getPythonTestingSection(scan: ScanResult): string {
+  const lines = ["## Testing"];
+  lines.push("");
+
+  const testCmd = scan.pythonInfo?.testCommand;
+  if (testCmd) {
+    lines.push("Run tests:");
+    lines.push(["```bash", testCmd, "```"].join("\n"));
+  } else {
+    lines.push("Add your testing command here.");
+    lines.push("");
+    lines.push("```bash");
+    lines.push("# Example: pytest");
+    lines.push("```");
+  }
+
+  return lines.join("\n");
+}
+
+// Python dependencies section
+function getPythonDependenciesSection(scan: ScanResult): string {
+  if (!scan.pythonInfo?.dependencies.length) {
+    return "";
+  }
+
+  const lines = ["## Dependencies"];
+  lines.push("");
+  lines.push("| Package | Version |");
+  lines.push("|---------|---------|");
+
+  const deps = parseDependenciesTable(scan.pythonInfo.dependencies);
+  deps.forEach(({ name, version }) => {
+    lines.push(`| ${name} | ${version} |`);
+  });
+
+  return lines.join("\n");
+}
+
+// Python development section
+function getPythonDevelopmentSection(scan: ScanResult): string {
+  const lines = ["## Development"];
+  lines.push("");
+  lines.push("```bash");
+
+  const pythonInfo = scan.pythonInfo;
+  if (pythonInfo?.installCommand) {
+    lines.push("# Install dependencies");
+    lines.push(pythonInfo.installCommand);
+  }
+  if (pythonInfo?.runCommand) {
+    lines.push("");
+    lines.push("# Run the project");
+    lines.push(pythonInfo.runCommand);
+  }
+  if (pythonInfo?.testCommand) {
+    lines.push("");
+    lines.push("# Run tests");
+    lines.push(pythonInfo.testCommand);
+  }
+
+  lines.push("```");
+  return lines.join("\n");
+}
+
+// Generate README for Python project
+function generatePythonReadme(
+  scan: ScanResult,
+  options: GenerateOptions,
+): string {
+  const sections: string[] = [];
+
+  // Title and description
+  sections.push(`# ${scan.packageName}`);
+  sections.push(scan.description);
+
+  // Features
+  sections.push("## Features");
+  sections.push(getPythonFeatureBullets(scan).join("\n"));
+
+  // Installation
+  sections.push(getPythonInstallationSection(scan));
+
+  // Usage
+  sections.push(getPythonUsageSection(scan));
+
+  // Testing
+  sections.push(getPythonTestingSection(scan));
+
+  // Dependencies
+  const depsSection = getPythonDependenciesSection(scan);
+  if (depsSection) {
+    sections.push(depsSection);
+  }
+
+  // Environment Variables
+  if (scan.envVariables.length > 0) {
+    sections.push("## Environment Variables");
+    sections.push("");
+    sections.push("Create a `.env` file in your project root:");
+    sections.push("");
+    sections.push("| Variable | Description |");
+    sections.push("|----------|-------------|");
+    scan.envVariables.forEach((key) => {
+      sections.push(`| \`${key}\` | Add your value |`);
+    });
+    sections.push("");
+    sections.push("Copy from `.env.example` and fill in your values.");
+  }
+
+  // Project Structure
+  if (options.includeTree) {
+    sections.push("## Project Structure");
+    sections.push("");
+    sections.push("```text");
+    sections.push(buildProjectTree(scan));
+    sections.push("```");
+  }
+
+  // Development
+  sections.push(getPythonDevelopmentSection(scan));
+
+  // License
+  sections.push("## License");
+  sections.push("");
+  if (scan.filePresence["LICENSE"]) {
+    sections.push(
+      "This project is licensed under the terms of the license included in the repository.",
+    );
+  } else {
+    sections.push("Add your license information here.");
+  }
+
+  return `${sections.join("\n")}\n`;
+}
+
+// Generate README for JavaScript/TypeScript project (original)
+function generateJavaScriptReadme(
   scan: ScanResult,
   options: GenerateOptions,
 ): string {
@@ -185,7 +391,7 @@ export function generateReadme(
   }
 
   // Available Scripts
-  if (scan.scripts.length > 0) {
+  if (scan.scripts.length > 0 && scan.packageManager) {
     const pm = getPackageManager(scan.packageManager);
     sections.push("## Available Scripts");
     sections.push("");
@@ -249,24 +455,28 @@ export function generateReadme(
   const hasCheckScript = scan.scripts.some((s) => s.name === "check");
   const hasBuildScript = scan.scripts.some((s) => s.name === "build");
   const hasDevScript = scan.scripts.some((s) => s.name === "dev");
-  const pm = getPackageManager(scan.packageManager);
+  const pm = scan.packageManager ? getPackageManager(scan.packageManager) : null;
 
   sections.push("## Development");
   sections.push("");
   sections.push("```bash");
-  sections.push("# Install dependencies");
-  sections.push(pm.install);
+  if (pm) {
+    sections.push("# Install dependencies");
+    sections.push(pm.install);
+  }
   if (hasCheckScript) {
     sections.push("");
     sections.push("# Run type checking");
-    sections.push(pm.run("check"));
+    if (pm) {
+      sections.push(pm.run("check"));
+    }
   }
-  if (hasBuildScript) {
+  if (hasBuildScript && pm) {
     sections.push("");
     sections.push("# Build the project");
     sections.push(pm.run("build"));
   }
-  if (hasDevScript) {
+  if (hasDevScript && pm) {
     sections.push("");
     sections.push("# Start development mode");
     sections.push(pm.run("dev"));
@@ -317,4 +527,14 @@ export function generateReadme(
   }
 
   return `${sections.join("\n")}\n`;
+}
+
+export function generateReadme(
+  scan: ScanResult,
+  options: GenerateOptions,
+): string {
+  if (scan.language === "python") {
+    return generatePythonReadme(scan, options);
+  }
+  return generateJavaScriptReadme(scan, options);
 }

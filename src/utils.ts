@@ -1,6 +1,8 @@
 import { constants } from "fs";
-import { access, readFile } from "fs/promises";
+import { access, readFile as fsReadFile } from "fs/promises";
 import path from "path";
+
+export { fsReadFile as readFile };
 
 export async function fileExists(filePath: string): Promise<boolean> {
   try {
@@ -12,7 +14,7 @@ export async function fileExists(filePath: string): Promise<boolean> {
 }
 
 export async function readJsonFile<T>(filePath: string): Promise<T> {
-  const content = await readFile(filePath, "utf8");
+  const content = await fsReadFile(filePath, "utf8");
   return JSON.parse(content) as T;
 }
 

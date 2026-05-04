@@ -31,7 +31,7 @@ function formatHelp(): string {
   return `
 ${pc.bold("README Auto Scan")}
 
-Scan a JavaScript or TypeScript project and generate a clean README.md automatically.
+Scan JavaScript, TypeScript, and Python projects and generate a clean README.md automatically.
 
 ${pc.bold("Usage:")}
   readme-autoscan [options]
@@ -64,10 +64,10 @@ async function run(options: CliOptions): Promise<void> {
   } catch (error) {
     if (
       error instanceof Error &&
-      error.message.includes("No package.json found")
+      error.message.includes("No supported project files found")
     ) {
       throw new Error(
-        "No package.json found. Please run this command inside a Node.js project.",
+        "No supported project files found. Please run this command inside a JavaScript, TypeScript, or Python project.",
       );
     }
     throw error;
@@ -78,8 +78,23 @@ async function run(options: CliOptions): Promise<void> {
     includeTree: options.includeTree,
   });
 
+  // Build status output
+  const statusLines: string[] = [];
+  statusLines.push(pc.cyan(`Detected language: ${scan.language}`));
+
+  if (scan.language === "python") {
+    if (scan.pythonInfo?.framework) {
+      statusLines.push(pc.cyan(`Detected framework: ${scan.pythonInfo.framework.charAt(0).toUpperCase() + scan.pythonInfo.framework.slice(1)}`));
+    }
+    if (scan.pythonInfo?.tool && scan.pythonInfo.tool !== "none") {
+      statusLines.push(pc.cyan(`Detected tool: ${scan.pythonInfo.tool}`));
+    }
+  } else {
+    statusLines.push(pc.cyan(`Detected package manager: ${scan.packageManager}`));
+  }
+
   if (options.dryRun) {
-    console.log(pc.cyan(`Detected package manager: ${scan.packageManager}`));
+    statusLines.forEach((line) => console.log(line));
     console.log(markdown);
     console.log(
       pc.cyan(
@@ -105,7 +120,7 @@ async function run(options: CliOptions): Promise<void> {
   }
 
   const relativePath = path.relative(rootDir, targetPath);
-  console.log(pc.cyan(`Detected package manager: ${scan.packageManager}`));
+  statusLines.forEach((line) => console.log(line));
   console.log(
     pc.green(`✓ README.md generated successfully at ${relativePath}`),
   );
@@ -130,7 +145,7 @@ export async function runCli(argv: string[] = process.argv): Promise<void> {
 
   program
     .name("readme-autoscan")
-    .description("Scan a JS/TS project and generate a clean README.md")
+    .description("Scan JS/TS and Python projects and generate a clean README.md")
     .option("--output <file>", "Write README to a custom file", "README.md")
     .option("--force", "Overwrite existing output file")
     .option("--dry-run", "Print generated README in terminal")
