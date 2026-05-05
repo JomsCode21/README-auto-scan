@@ -7,6 +7,11 @@ import {
   getPythonProjectInfo,
   type PythonProjectInfo,
 } from "./languages/python";
+import {
+  detectPhpProject,
+  getPhpProjectInfo,
+  type PhpProjectInfo,
+} from "./languages/php";
 import { detectPackageManager, type PackageManagerName } from "./package-manager";
 import { explainScripts } from "./scripts";
 import {
@@ -33,7 +38,7 @@ export interface PackageJson {
   author?: string | { name?: string };
 }
 
-export type ProjectLanguage = "javascript" | "typescript" | "python";
+export type ProjectLanguage = "javascript" | "typescript" | "python" | "php";
 
 export interface ScanResult {
   rootDir: string;
@@ -60,6 +65,9 @@ export interface ScanResult {
   packageManager?: PackageManagerName;
   // Python specific (optional for JS/TS)
   pythonInfo?: PythonProjectInfo;
+  // PHP specific (optional for JS/TS/Python)
+  phpInfo?: PhpProjectInfo;
+  composerScripts?: Array<{ name: string; command: string; description: string }>;
 }
 
 const IMPORTANT_FILES = [
@@ -86,14 +94,22 @@ const IMPORTANT_FILES = [
 export async function scanProject(rootDir: string): Promise<ScanResult> {
   const packageJsonPath = path.join(rootDir, "package.json");
   const hasPackageJson = await fileExists(packageJsonPath);
+  const hasArtisan = await fileExists(path.join(rootDir, "artisan"));
 
   // Check for Python project (only if no package.json exists)
   const isPythonProject = hasPackageJson ? false : await detectPythonProject(rootDir);
+  // Check for PHP project (only if no package.json and not Python),
+  // but give Laravel (artisan) priority even if package.json exists
+  const isPhpProject = hasArtisan
+    ? true
+    : hasPackageJson || isPythonProject
+      ? false
+      : await detectPhpProject(rootDir);
 
-  // If neither package.json nor Python files found
-  if (!hasPackageJson && !isPythonProject) {
+  // If no supported files found
+  if (!hasPackageJson && !isPythonProject && !isPhpProject) {
     throw new Error(
-      "No supported project files found. Please run this command inside a JavaScript, TypeScript, or Python project.",
+      "No supported project files found. Please run this command inside a JavaScript, TypeScript, Python, or PHP project.",
     );
   }
 
@@ -185,6 +201,96 @@ export async function scanProject(rootDir: string): Promise<ScanResult> {
       sourceFiles,
       testFiles,
       pythonInfo,
+    };
+  }
+
+  // Handle PHP project (Laravel takes priority even if package.json exists)
+  if (isPhpProject) {
+    const phpInfo = await getPhpProjectInfo(rootDir);
+
+    const phpImportantFiles = [
+      "composer.json",
+      "composer.lock",
+      "index.php",
+      "artisan",
+      "phpunit.xml",
+      "phpunit.xml.dist",
+      "bootstrap/app.php",
+      "routes/web.php",
+      "routes/api.php",
+      "app/Http",
+      "README.md",
+      "LICENSE",
+      ".env.example",
+    ];
+
+    const filePresenceEntries = await Promise.all(
+      phpImportantFiles.map(
+        async (file) => [file, await fileExists(path.join(rootDir, file))] as const,
+      ),
+    );
+    const filePresence = Object.fromEntries(filePresenceEntries);
+
+    const sourceFiles = (
+      await fg(["**/*.php"], {
+        cwd: rootDir,
+        ignore: [
+          "vendor/**",
+          "node_modules/**",
+          "storage/logs/**",
+          "storage/framework/**",
+          "bootstrap/cache/**",
+          "dist/**",
+          "build/**",
+          "coverage/**",
+          ".git/**",
+          ".idea/**",
+          ".vscode/**",
+        ],
+        onlyFiles: true,
+      })
+    ).map(toPosixPath);
+
+    const testFiles = (
+      await fg(["**/*Test.php", "**/tests/**/*.php"], {
+        cwd: rootDir,
+        ignore: ["vendor/**", "node_modules/**"],
+        onlyFiles: true,
+      })
+    ).map(toPosixPath);
+
+    const envVariables = filePresence[".env.example"]
+      ? await parseEnvExample(path.join(rootDir, ".env.example"))
+      : [];
+
+    const projectTypes: string[] = ["PHP project"];
+    if (phpInfo.framework === "laravel") {
+      projectTypes.push("Laravel project");
+    }
+
+    return {
+      rootDir,
+      language: "php",
+      packageName: phpInfo.projectName,
+      description: phpInfo.description,
+      version: "0.1.0",
+      dependencies: Object.keys(phpInfo.dependencies ?? {}),
+      devDependencies: Object.keys(phpInfo.devDependencies ?? {}),
+      scripts: [],
+      hasBin: false,
+      binCommands: [],
+      exportsInfo: {},
+      repository: undefined,
+      license: phpInfo.license,
+      author: undefined,
+      filePresence,
+      projectTypes,
+      envVariables,
+      sourceFiles,
+      testFiles,
+      // packageManager intentionally omitted for PHP to avoid JS managers
+      phpInfo,
+      composerScripts: phpInfo.composerScripts,
     };
   }
 

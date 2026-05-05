@@ -31,7 +31,7 @@ function formatHelp(): string {
   return `
 ${pc.bold("README Auto Scan")}
 
-Scan JavaScript, TypeScript, and Python projects and generate a clean README.md automatically.
+Scan JavaScript, TypeScript, Python, and PHP projects and generate a clean README.md automatically.
 
 ${pc.bold("Usage:")}
   readme-autoscan [options]
@@ -67,7 +67,7 @@ async function run(options: CliOptions): Promise<void> {
       error.message.includes("No supported project files found")
     ) {
       throw new Error(
-        "No supported project files found. Please run this command inside a JavaScript, TypeScript, or Python project.",
+        "No supported project files found. Please run this command inside a JavaScript, TypeScript, Python, or PHP project.",
       );
     }
     throw error;
@@ -88,6 +88,14 @@ async function run(options: CliOptions): Promise<void> {
     }
     if (scan.pythonInfo?.tool && scan.pythonInfo.tool !== "none") {
       statusLines.push(pc.cyan(`Detected tool: ${scan.pythonInfo.tool}`));
+    }
+  } else if (scan.language === "php") {
+    if (scan.phpInfo?.framework) {
+      statusLines.push(pc.cyan(`Detected framework: ${scan.phpInfo.framework.charAt(0).toUpperCase() + scan.phpInfo.framework.slice(1)}`));
+    }
+    if (scan.phpInfo?.packageManager) {
+      const pmLabel = scan.phpInfo.packageManager === "composer" ? "Composer" : scan.phpInfo.packageManager;
+      statusLines.push(pc.cyan(`Detected package manager: ${pmLabel}`));
     }
   } else {
     statusLines.push(pc.cyan(`Detected package manager: ${scan.packageManager}`));
@@ -145,7 +153,7 @@ export async function runCli(argv: string[] = process.argv): Promise<void> {
 
   program
     .name("readme-autoscan")
-    .description("Scan JS/TS and Python projects and generate a clean README.md")
+    .description("Scan JavaScript, TypeScript, Python, and PHP projects and generate a clean README.md")
     .option("--output <file>", "Write README to a custom file", "README.md")
     .option("--force", "Overwrite existing output file")
     .option("--dry-run", "Print generated README in terminal")

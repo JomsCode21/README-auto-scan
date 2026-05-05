@@ -1,0 +1,4 @@
+#!/usr/bin/env php
+<?php
+// Placeholder for Laravel's artisan CLI
+exit(0);

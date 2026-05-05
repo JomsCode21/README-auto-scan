@@ -1,7 +1,7 @@
 {
   "name": "readme-autoscan",
-  "version": "1.2.1",
-  "description": "CLI tool that scans JavaScript, TypeScript, and Python projects and automatically generates clean, professional README.md files with installation, usage, scripts, environment variables, and publishing checklist.",
+  "version": "1.3.0",
+  "description": "CLI tool that scans JavaScript, TypeScript, Python, and PHP projects and automatically generates clean, professional README.md files with installation, usage, scripts, environment variables, and publishing checklist.",
   "main": "dist/cli.js",
   "types": "dist/cli.d.ts",
   "bin": {
@@ -34,6 +34,9 @@
     "django",
     "poetry",
     "pipenv",
+    "php",
+    "laravel",
+    "composer",
     "auto-generate",
     "documentation-tool"
   ],

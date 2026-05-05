@@ -351,6 +351,177 @@ function generatePythonReadme(
   return `${sections.join("\n")}\n`;
 }
 
+// Generate README for PHP project
+function generatePhpReadme(
+  scan: ScanResult,
+  options: GenerateOptions,
+): string {
+  const phpInfo = scan.phpInfo!;
+  const sections: string[] = [];
+
+  sections.push(`# ${scan.packageName}`);
+  sections.push(scan.description);
+
+  sections.push("## Features");
+  const phpFeatures: string[] = [];
+  if (phpInfo.framework === "laravel") {
+    phpFeatures.push("Laravel project detection");
+    phpFeatures.push("Local development server instructions");
+    phpFeatures.push("Environment setup commands");
+    phpFeatures.push("Database migration command");
+    phpFeatures.push("Laravel testing command");
+  } else {
+    phpFeatures.push("PHP project detection");
+    phpFeatures.push("Composer installation instructions");
+    phpFeatures.push("Development and testing commands");
+  }
+  if (scan.envVariables.length > 0) {
+    phpFeatures.push("Environment variable documentation, if .env.example exists");
+  }
+  phpFeatures.push("Clean, professional markdown formatting");
+  sections.push(phpFeatures.map((f) => `- ${f}`).join("\n"));
+
+  // Installation
+  const installLines: string[] = ["## Installation", ""];
+  if (phpInfo.packageManager === "composer") {
+    installLines.push("Install dependencies:");
+    installLines.push(["```bash", phpInfo.installCommand, "```"].join("\n"));
+  }
+  if (phpInfo.framework === "laravel") {
+    installLines.push("");
+    installLines.push("Environment setup:");
+    installLines.push([
+      "```bash",
+      "cp .env.example .env",
+      "php artisan key:generate",
+      "```",
+    ].join("\n"));
+    if (phpInfo.frontend?.hasPackageJson && phpInfo.frontend.hasDevScript) {
+      installLines.push("");
+      installLines.push("Optional frontend setup:");
+      installLines.push(["```bash", "npm install", "npm run dev", "```"].join("\n"));
+    }
+  }
+  sections.push(installLines.join("\n"));
+
+  // Usage
+  sections.push("## Usage");
+  sections.push(["```bash", phpInfo.runCommand, "```"].join("\n"));
+
+  // Database (Laravel only)
+  if (phpInfo.framework === "laravel") {
+    sections.push("## Database");
+    sections.push("");
+    sections.push(["```bash", "php artisan migrate", "```"].join("\n"));
+  }
+
+  // Testing
+  sections.push("## Testing");
+  sections.push(["```bash", phpInfo.testCommand, "```"].join("\n"));
+
+  // Dependencies from composer.json
+  const prodEntries = Object.entries(phpInfo.dependencies ?? {});
+  const devEntries = Object.entries(phpInfo.devDependencies ?? {});
+  if (prodEntries.length || devEntries.length) {
+    sections.push("## Dependencies");
+    if (prodEntries.length) {
+      sections.push("");
+      sections.push("### Production Dependencies");
+      sections.push("| Package | Version |");
+      sections.push("|---------|---------|");
+      prodEntries.forEach(([name, version]) => {
+        sections.push(`| ${name} | ${version} |`);
+      });
+    }
+    if (devEntries.length) {
+      sections.push("");
+      sections.push("### Development Dependencies");
+      sections.push("| Package | Version |");
+      sections.push("|---------|---------|");
+      devEntries.forEach(([name, version]) => {
+        sections.push(`| ${name} | ${version} |`);
+      });
+    }
+  }
+
+  // Environment Variables
+  if (scan.envVariables.length > 0) {
+    sections.push("## Environment Variables");
+    sections.push("");
+    sections.push("| Variable | Description |");
+    sections.push("|----------|-------------|");
+    scan.envVariables.forEach((key) => {
+      sections.push(`| \`${key}\` | Add description |`);
+    });
+  }
+
+  // Available Composer Scripts
+  const composerScripts = phpInfo.composerScripts ?? [];
+  if (composerScripts.length > 0) {
+    sections.push("## Available Composer Scripts");
+    sections.push("");
+    sections.push("| Script | Description |");
+    sections.push("|---|---|");
+    composerScripts.forEach((s) => {
+      sections.push(`| \`composer ${s.name}\` | ${s.description} |`);
+    });
+  }
+
+  // Project Structure
+  if (options.includeTree) {
+    sections.push("## Project Structure");
+    sections.push("");
+    sections.push("```text");
+    sections.push(buildProjectTree(scan));
+    sections.push("```");
+  }
+
+  // Development quick start
+  sections.push("## Development");
+  sections.push("");
+  sections.push("```bash");
+  if (phpInfo.installCommand) {
+    sections.push("# Install dependencies");
+    sections.push(phpInfo.installCommand);
+  }
+  if (phpInfo.framework === "laravel") {
+    sections.push("");
+    sections.push("# Environment setup");
+    sections.push("cp .env.example .env");
+    sections.push("php artisan key:generate");
+  }
+  if (phpInfo.frontend?.hasPackageJson && phpInfo.frontend.hasDevScript) {
+    sections.push("");
+    sections.push("# Frontend development (optional)");
+    sections.push("npm install");
+    sections.push("npm run dev");
+  }
+  if (phpInfo.runCommand) {
+    sections.push("");
+    sections.push("# Run the project");
+    sections.push(phpInfo.runCommand);
+  }
+  if (phpInfo.testCommand) {
+    sections.push("");
+    sections.push("# Run tests");
+    sections.push(phpInfo.testCommand);
+  }
+  sections.push("```");
+
+  // License
+  sections.push("## License");
+  sections.push("");
+  if (scan.filePresence["LICENSE"] || scan.license) {
+    sections.push(
+      "This project is licensed under the terms of the license included in the repository.",
+    );
+  } else {
+    sections.push("Add your license information here.");
+  }
+
+  return `${sections.join("\n")}\n`;
+}
+
 // Generate README for JavaScript/TypeScript project (original)
 function generateJavaScriptReadme(
   scan: ScanResult,
@@ -535,6 +706,9 @@ export function generateReadme(
 ): string {
   if (scan.language === "python") {
     return generatePythonReadme(scan, options);
+  }
+  if (scan.language === "php") {
+    return generatePhpReadme(scan, options);
   }
   return generateJavaScriptReadme(scan, options);
 }

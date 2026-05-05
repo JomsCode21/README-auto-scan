@@ -1,0 +1,17 @@
+{
+  "name": "example/php-laravel",
+  "description": "Example Laravel project for README Auto Scan.",
+  "require": {
+    "php": "^8.2",
+    "laravel/framework": "^11.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^11.0",
+    "laravel/pint": "^1.0"
+  },
+  "scripts": {
+    "test": "php artisan test",
+    "format": "pint"
+  },
+  "license": "MIT"
+}

@@ -12,6 +12,8 @@ This folder contains example projects demonstrating the README output generated 
 | [python-poetry](./python-poetry/) | Example generated README for a Python Poetry project |
 | [python-pipenv](./python-pipenv/) | Example generated README for a Python Pipenv project |
 | [python-django](./python-django/) | Example generated README for a Django project |
+| [php-basic](./php-basic/) | Example generated README for a basic PHP project |
+| [php-laravel](./php-laravel/) | Example generated README for a Laravel project |
 
 ## About These Examples
 

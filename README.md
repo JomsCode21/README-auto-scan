@@ -5,13 +5,13 @@
 [![license](https://img.shields.io/npm/l/readme-autoscan.svg)](LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/JomsCode21/README-auto-scan.svg)](https://github.com/JomsCode21/README-auto-scan/stargazers)
 
-> CLI tool that scans JavaScript, TypeScript, and Python projects and automatically generates clean README.md files with installation, usage, scripts, environment variables, and publishing checklist.
+> CLI tool that scans JavaScript, TypeScript, Python, and PHP projects and automatically generates clean README.md files with installation, usage, scripts, environment variables, and publishing checklist.
 
 ## Features
 
-- **Multi-Language Support** — JavaScript, TypeScript, and Python projects
+- **Multi-Language Support** — JavaScript, TypeScript, Python, and PHP projects
 - **Smart Project Detection** — Automatically detects project types (Node.js, React, Vue, Next.js, Vite, Express, TypeScript, CLI packages, Python, Django, Flask)
-- **Package Manager Detection** — npm, pnpm, yarn, bun for JS/TS; pip, Poetry, Pipenv for Python
+- **Package Manager Detection** — npm, pnpm, yarn, bun for JS/TS; pip, Poetry, Pipenv for Python; Composer for PHP
 - **Package.json Analysis** — Extracts metadata, scripts, dependencies, exports, and repository info
 - **Auto-Generated Documentation** — Creates professional README sections with proper formatting
 - **Environment Variables** — Parses `.env.example` and includes variable tables
@@ -166,15 +166,17 @@ README Auto Scan automatically detects these project types:
 | Python | Has `requirements.txt`, `pyproject.toml`, `setup.py`, etc. |
 | Django | Has `manage.py` or `django` in dependencies |
 | Flask | Has `app.py` or `flask` in dependencies |
+| Laravel | Has `artisan` or `laravel/framework` in composer requirements |
 
 ## Multi-Language Support
 
-README Auto Scan supports JavaScript, TypeScript, and Python projects.
+README Auto Scan supports JavaScript, TypeScript, Python, and PHP projects.
 
 | Language | Detection Files |
 | -------- | --------------- |
 | JavaScript/TypeScript | `package.json`, `tsconfig.json`, `vite.config.*`, `next.config.js` |
 | Python | `requirements.txt`, `pyproject.toml`, `setup.py`, `Pipfile`, `poetry.lock`, `main.py`, `app.py`, `manage.py` |
+| PHP | `composer.json`, `composer.lock`, `index.php`, `artisan`, `phpunit.xml`, `phpunit.xml.dist` |
 
 ### JavaScript/TypeScript Package Manager Detection
 
@@ -241,6 +243,24 @@ Dependencies:
 | flask | ==3.0.0 |
 ```
 
+### PHP and Laravel Support
+
+README Auto Scan detects common PHP and Laravel project files and generates PHP-friendly README sections.
+
+| PHP Type | Detection Files |
+| -------- | ---------------- |
+| Basic PHP | `index.php`, `composer.json` |
+| Composer | `composer.json`, `composer.lock` |
+| Laravel | `artisan`, `routes/web.php`, `routes/api.php`, `bootstrap/app.php`, `app/Http` |
+| PHPUnit | `phpunit.xml`, `phpunit.xml.dist` |
+
+| PHP Tool | Example Commands |
+| -------- | ---------------- |
+| Composer | `composer install` |
+| Laravel Artisan | `php artisan serve` |
+| Laravel Tests | `php artisan test` |
+| PHPUnit | `vendor/bin/phpunit` |
+
 ## Development
 
 ```bash
@@ -274,7 +294,8 @@ readme-autoscan/
 │  ├─ package-manager.ts    # Package manager detection
 │  ├─ utils.ts               # Utility functions
 │  └─ languages/
-│     └─ python.ts           # Python project detection
+│     ├─ python.ts           # Python project detection
+│     └─ php.ts              # PHP/Laravel project detection
 ├─ tests/
 │  ├─ generator.test.ts
 │  ├─ package-manager.test.ts
@@ -320,6 +341,8 @@ README Auto Scan includes example generated README files for all supported proje
 | Python Poetry Project | [`examples/python-poetry/README.generated.md`](./examples/python-poetry/README.generated.md) |
 | Python Pipenv Project | [`examples/python-pipenv/README.generated.md`](./examples/python-pipenv/README.generated.md) |
 | Python Django Project | [`examples/python-django/README.generated.md`](./examples/python-django/README.generated.md) |
+| Basic PHP Project | [`examples/php-basic/README.generated.md`](./examples/php-basic/README.generated.md) |
+| Laravel Project | [`examples/php-laravel/README.generated.md`](./examples/php-laravel/README.generated.md) |
 
 Preview an example locally:
 
@@ -354,4 +377,4 @@ Copyright (c) 2026 JomsCode21
 
 ---
 
-Made for the JavaScript, TypeScript, and Python community
+Made for the JavaScript, TypeScript, Python, and PHP community
